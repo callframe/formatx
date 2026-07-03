@@ -1,6 +1,10 @@
 //! Format engine - applies [`FormatSpec`] to produce formatted output.
 
-use crate::{ast::*, error::Error, value::FormatValue};
+use crate::{
+    ast::*,
+    error::Error,
+    value::{FormatArg, FormatValue},
+};
 use alloc::{
     format,
     string::{String, ToString},
@@ -12,7 +16,7 @@ pub fn render(
     output: &mut String,
     source: &str,
     parsed: &FormatString,
-    args: &[&dyn FormatValue],
+    args: &[FormatArg],
     named: &[(&str, usize)],
     strict: bool,
 ) -> Result<(), Error> {
@@ -40,7 +44,7 @@ pub fn render(
                     resolve_argument(&placeholder.argument, source, &mut implicit_pos, named);
 
                 let arg = match arg_index {
-                    Some(idx) if idx < args.len() => Some(args[idx]),
+                    Some(idx) if idx < args.len() => Some(args[idx].as_value()),
                     Some(_) | None => None,
                 };
 
@@ -125,7 +129,7 @@ fn resolve_argument(
 fn resolve_count_value(
     count: &Option<Count>,
     source: &str,
-    args: &[&dyn FormatValue],
+    args: &[FormatArg],
     named: &[(&str, usize)],
 ) -> Result<Option<usize>, Error> {
     let Some(count) = count else { return Ok(None) };
@@ -152,7 +156,7 @@ fn resolve_count_value(
                     message: format!("count argument index {idx} out of range"),
                 });
             }
-            let formatted = format!("{}", args[idx]);
+            let formatted = format!("{}", args[idx].as_value());
             formatted
                 .parse::<usize>()
                 .map(Some)
@@ -167,7 +171,7 @@ fn resolve_count_value(
 fn resolve_precision(
     precision: &Option<Precision>,
     source: &str,
-    args: &[&dyn FormatValue],
+    args: &[FormatArg],
     named: &[(&str, usize)],
     implicit_pos: &mut usize,
 ) -> Result<Option<usize>, Error> {
@@ -185,7 +189,7 @@ fn resolve_precision(
                     message: "not enough arguments for `.*` precision".to_string(),
                 });
             }
-            let formatted = format!("{}", args[idx]);
+            let formatted = format!("{}", args[idx].as_value());
             formatted
                 .parse::<usize>()
                 .map(Some)
@@ -296,10 +300,18 @@ fn format_full(
                 (true, false, _, None, Some(p)) => write!(output, "{:+.prec$?}", dbg, prec = p),
                 (false, true, _, None, Some(p)) => write!(output, "{:#.prec$?}", dbg, prec = p),
                 (true, true, _, None, Some(p)) => write!(output, "{:+#.prec$?}", dbg, prec = p),
-                (false, false, false, Some(w), None) => write!(output, "{:width$?}", dbg, width = w),
-                (true, false, false, Some(w), None) => write!(output, "{:+width$?}", dbg, width = w),
-                (false, true, false, Some(w), None) => write!(output, "{:#width$?}", dbg, width = w),
-                (true, true, false, Some(w), None) => write!(output, "{:+#width$?}", dbg, width = w),
+                (false, false, false, Some(w), None) => {
+                    write!(output, "{:width$?}", dbg, width = w)
+                }
+                (true, false, false, Some(w), None) => {
+                    write!(output, "{:+width$?}", dbg, width = w)
+                }
+                (false, true, false, Some(w), None) => {
+                    write!(output, "{:#width$?}", dbg, width = w)
+                }
+                (true, true, false, Some(w), None) => {
+                    write!(output, "{:+#width$?}", dbg, width = w)
+                }
                 (false, false, false, Some(w), Some(p)) => {
                     write!(output, "{:width$.prec$?}", dbg, width = w, prec = p)
                 }
@@ -312,10 +324,18 @@ fn format_full(
                 (true, true, false, Some(w), Some(p)) => {
                     write!(output, "{:+#width$.prec$?}", dbg, width = w, prec = p)
                 }
-                (false, false, true, Some(w), None) => write!(output, "{:0width$?}", dbg, width = w),
-                (true, false, true, Some(w), None) => write!(output, "{:+0width$?}", dbg, width = w),
-                (false, true, true, Some(w), None) => write!(output, "{:#0width$?}", dbg, width = w),
-                (true, true, true, Some(w), None) => write!(output, "{:+#0width$?}", dbg, width = w),
+                (false, false, true, Some(w), None) => {
+                    write!(output, "{:0width$?}", dbg, width = w)
+                }
+                (true, false, true, Some(w), None) => {
+                    write!(output, "{:+0width$?}", dbg, width = w)
+                }
+                (false, true, true, Some(w), None) => {
+                    write!(output, "{:#0width$?}", dbg, width = w)
+                }
+                (true, true, true, Some(w), None) => {
+                    write!(output, "{:+#0width$?}", dbg, width = w)
+                }
                 (false, false, true, Some(w), Some(p)) => {
                     write!(output, "{:0width$.prec$?}", dbg, width = w, prec = p)
                 }

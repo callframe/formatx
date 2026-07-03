@@ -1,8 +1,12 @@
 //! The [`Renderer`] builder - collects arguments and produces formatted output.
 
-use crate::{error::Error, format, template::Template, value::FormatValue};
+use crate::{
+    error::Error,
+    format,
+    template::Template,
+    value::{FormatArg, IntoFormatArg},
+};
 use alloc::{string::String, vec::Vec};
-use core::fmt::{Debug, Display};
 
 /// A builder for rendering a [`Template`] with arguments.
 ///
@@ -22,7 +26,7 @@ use core::fmt::{Debug, Display};
 /// ```
 pub struct Renderer<'a> {
     template: &'a Template,
-    args: Vec<&'a dyn FormatValue>,
+    args: Vec<FormatArg<'a>>,
     named: Vec<(&'a str, usize)>,
 }
 
@@ -38,16 +42,16 @@ impl<'a> Renderer<'a> {
 
     /// Add a positional argument.
     #[inline]
-    pub fn arg(&mut self, value: &'a (impl Display + Debug)) -> &mut Self {
-        self.args.push(value as &dyn FormatValue);
+    pub fn arg(&mut self, value: impl IntoFormatArg<'a>) -> &mut Self {
+        self.args.push(value.into_format_arg());
         self
     }
 
     /// Add a named argument.
     #[inline]
-    pub fn named(&mut self, name: &'a str, value: &'a (impl Display + Debug)) -> &mut Self {
+    pub fn named(&mut self, name: &'a str, value: impl IntoFormatArg<'a>) -> &mut Self {
         let index = self.args.len();
-        self.args.push(value as &dyn FormatValue);
+        self.args.push(value.into_format_arg());
         self.named.push((name, index));
         self
     }

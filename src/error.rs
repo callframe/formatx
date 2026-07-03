@@ -8,20 +8,11 @@ use core::fmt;
 #[derive(Debug)]
 pub enum Error {
     /// The format string could not be parsed.
-    Parse {
-        span: Span,
-        message: String,
-    },
+    Parse { span: Span, message: String },
     /// A placeholder references an argument that was not provided.
-    MissingArgument {
-        name: String,
-        span: Span,
-    },
+    MissingArgument { name: String, span: Span },
     /// A format type (e.g. `{:x}`) requires a trait we don't support.
-    UnsupportedTrait {
-        format_type: FormatType,
-        span: Span,
-    },
+    UnsupportedTrait { format_type: FormatType, span: Span },
     /// An underlying `std::fmt::Error` occurred during formatting.
     Format(fmt::Error),
 }

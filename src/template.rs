@@ -6,10 +6,7 @@ use crate::{
     parser,
     renderer::Renderer,
 };
-use alloc::{
-    string::String,
-    vec::Vec,
-};
+use alloc::{string::String, vec::Vec};
 use core::{fmt, str::FromStr};
 
 /// An owned, parsed format string that can be rendered many times with different arguments.
