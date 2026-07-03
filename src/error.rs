@@ -1,7 +1,8 @@
 //! Error types for formatx.
 
 use crate::ast::{FormatType, Span};
-use std::fmt;
+use alloc::string::String;
+use core::fmt;
 
 /// Errors that can occur during parsing or formatting.
 #[derive(Debug)]
@@ -52,8 +53,8 @@ impl fmt::Display for Error {
     }
 }
 
-impl std::error::Error for Error {
-    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+impl core::error::Error for Error {
+    fn source(&self) -> Option<&(dyn core::error::Error + 'static)> {
         if let Self::Format(e) = self {
             Some(e)
         } else {

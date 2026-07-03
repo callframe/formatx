@@ -1,6 +1,6 @@
 //! The [`FormatValue`] marker trait.
 
-use std::fmt::{Debug, Display};
+use core::fmt::{Debug, Display};
 
 /// Marker trait for values that can be formatted at runtime.
 ///

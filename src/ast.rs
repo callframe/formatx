@@ -1,5 +1,7 @@
 //! Typed AST for parsed format strings.
 
+use alloc::vec::Vec;
+
 /// Byte range in the source format string.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Span {

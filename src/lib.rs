@@ -1,3 +1,5 @@
+#![cfg_attr(not(test), no_std)]
+
 //! `formatx` lets you format strings at runtime using the same syntax as
 //! [`std::fmt`] (`{}`, `{:?}`, `{name}`, etc.), but with runtime template
 //! strings instead of compile-time literals with **zero** dependencies.
@@ -42,6 +44,8 @@
 //! assert_eq!(r2, "Bob has 7 items");
 //! ```
 
+extern crate alloc;
+
 mod ast;
 mod error;
 mod format;
@@ -50,6 +54,12 @@ mod parser;
 mod renderer;
 mod template;
 mod value;
+
+#[doc(hidden)]
+pub mod __private {
+    pub use alloc::string::String;
+    pub use core::result::Result;
+}
 
 pub use ast::FormatType;
 pub use error::Error;

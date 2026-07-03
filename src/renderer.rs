@@ -1,7 +1,8 @@
 //! The [`Renderer`] builder - collects arguments and produces formatted output.
 
 use crate::{error::Error, format, template::Template, value::FormatValue};
-use std::fmt::{Debug, Display};
+use alloc::{string::String, vec::Vec};
+use core::fmt::{Debug, Display};
 
 /// A builder for rendering a [`Template`] with arguments.
 ///

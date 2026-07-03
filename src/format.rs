@@ -1,7 +1,11 @@
 //! Format engine - applies [`FormatSpec`] to produce formatted output.
 
 use crate::{ast::*, error::Error, value::FormatValue};
-use std::fmt::{Debug, Write};
+use alloc::{
+    format,
+    string::{String, ToString},
+};
+use core::fmt::{Debug, Write};
 
 /// Render a parsed [`FormatString`] into `output` using the provided arguments.
 pub fn render(

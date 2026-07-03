@@ -6,7 +6,11 @@ use crate::{
     parser,
     renderer::Renderer,
 };
-use std::{fmt, str::FromStr};
+use alloc::{
+    string::String,
+    vec::Vec,
+};
+use core::{fmt, str::FromStr};
 
 /// An owned, parsed format string that can be rendered many times with different arguments.
 ///
