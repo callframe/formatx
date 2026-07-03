@@ -11,13 +11,15 @@ use alloc::{
 };
 use core::fmt::{Debug, Write};
 
+type NamedArgs<'a> = [(&'a str, usize)];
+
 /// Render a parsed [`FormatString`] into `output` using the provided arguments.
 pub fn render(
     output: &mut String,
     source: &str,
     parsed: &FormatString,
     args: &[FormatArg],
-    named: &[(&str, usize)],
+    named: &NamedArgs,
     strict: bool,
 ) -> Result<(), Error> {
     let mut implicit_pos: usize = 0;
@@ -110,7 +112,7 @@ fn resolve_argument(
     argument: &Argument,
     source: &str,
     implicit_pos: &mut usize,
-    named: &[(&str, usize)],
+    named: &NamedArgs,
 ) -> Option<usize> {
     match argument {
         Argument::Implicit => {
@@ -130,7 +132,7 @@ fn resolve_count_value(
     count: &Option<Count>,
     source: &str,
     args: &[FormatArg],
-    named: &[(&str, usize)],
+    named: &NamedArgs,
 ) -> Result<Option<usize>, Error> {
     let Some(count) = count else { return Ok(None) };
     match count {
@@ -172,7 +174,7 @@ fn resolve_precision(
     precision: &Option<Precision>,
     source: &str,
     args: &[FormatArg],
-    named: &[(&str, usize)],
+    named: &NamedArgs,
     implicit_pos: &mut usize,
 ) -> Result<Option<usize>, Error> {
     let Some(prec) = precision else {

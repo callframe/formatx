@@ -25,14 +25,14 @@ use alloc::{string::String, vec::Vec};
 /// assert_eq!(result, "1 + 2 = 3");
 /// ```
 pub struct Renderer<'a> {
-    template: &'a Template,
+    template: &'a Template<'a>,
     args: Vec<FormatArg<'a>>,
     named: Vec<(&'a str, usize)>,
 }
 
 impl<'a> Renderer<'a> {
     /// Create a new renderer for the given template.
-    pub(crate) fn new(template: &'a Template) -> Self {
+    pub(crate) fn new(template: &'a Template<'a>) -> Self {
         Self {
             template,
             args: Vec::new(),
@@ -42,14 +42,14 @@ impl<'a> Renderer<'a> {
 
     /// Add a positional argument.
     #[inline]
-    pub fn arg(&mut self, value: impl IntoFormatArg<'a>) -> &mut Self {
+    pub fn arg<V: IntoFormatArg<'a>>(&mut self, value: V) -> &mut Self {
         self.args.push(value.into_format_arg());
         self
     }
 
     /// Add a named argument.
     #[inline]
-    pub fn named(&mut self, name: &'a str, value: impl IntoFormatArg<'a>) -> &mut Self {
+    pub fn named<V: IntoFormatArg<'a>>(&mut self, name: &'a str, value: V) -> &mut Self {
         let index = self.args.len();
         self.args.push(value.into_format_arg());
         self.named.push((name, index));
